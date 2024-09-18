@@ -1,26 +1,34 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16' // You can change this to the required Node.js version
-            args '-u root'  // Run as root to avoid permission issues
-        }
-    }
+    agent any
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from GitHub
-                git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
+                script {
+                    docker.image('node:16').inside {
+                        // Checkout the code from GitHub
+                        git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
+                    }
+                }
             }
         }
         stage('Install Dependencies') {
             steps {
-                // Install dependencies
-                sh 'npm install'
+                script {
+                    docker.image('node:16').inside {
+                        // Install dependencies
+                        sh 'npm install'
+                    }
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                script {
+                    docker.image('node:16').inside {
+                        // Run tests
+                        sh 'npm test'
+                    }
+                }
             }
         }
     }
