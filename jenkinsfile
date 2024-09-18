@@ -40,21 +40,14 @@ pipeline {
                     // Capture test results or logs
                     def testLog = sh(script: 'curl ${BUILD_URL}/consoleText').trim()
                     
-                    // Escape quotes and newlines in the test log to ensure valid JSON
-                    def escapedTestLog = testLog.replaceAll('(["\\\\])', '\\\\$1').replaceAll('\n', '\\n')
-                    
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
-                        // Use a String for encoding the authorization header
-                        def authString = "${JIRA_USER}:${JIRA_API_TOKEN}".toString()
-                        def encodedAuthString = authString.bytes.encodeBase64().toString()
-                        
                         // Construct the curl command to post a comment to JIRA
                         def curlCommand = """
                             curl -X POST \
                             -H "Content-Type: application/json" \
-                            -H "Authorization: Basic ${encodedAuthString}" \
-                            -d '{"body": "${escapedTestLog}"}' \
+                            -u ${JIRA_USER}:${JIRA_API_TOKEN} \
+                            -d '{"body": "${testLog}"}' \
                             ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
                         """
                         
