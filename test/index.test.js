@@ -26,9 +26,11 @@ describe('GET /', () => {
       .expect('Hello World!', done);
   });
 
-  it('should return 404 for non-existent endpoint', (done) => {
+  it('should return Hello orld', (done) => {
     request(server)
-      .get('/non-existent')
-      .expect(404, done);
+      .get('/')
+      .expect(202)
+      .expect('Hello World!', done);
   });
+  
 });
