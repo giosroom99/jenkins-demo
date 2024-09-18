@@ -1,35 +1,26 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'my-node-app'
+            args '-v /tmp:/tmp'  // Optional: mount volumes or pass additional arguments if needed
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    docker.image('node:16').inside {
-                        // Checkout the code from GitHub
-                        git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
-                    }
-                }
+                git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
             }
         }
         stage('Install Dependencies') {
             steps {
-                script {
-                    docker.image('node:16').inside {
-                        // Install dependencies
-                        sh 'npm install'
-                    }
-                }
+                sh 'npm install'
             }
         }
         stage('Run Tests') {
             steps {
-                script {
-                    docker.image('node:16').inside {
-                        // Run tests
-                        sh 'npm test'
-                    }
-                }
+                sh 'npm test'
             }
         }
     }
+
 }
