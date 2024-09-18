@@ -3,6 +3,7 @@ pipeline {
     environment {
         JIRA_URL = 'https://injam2024.atlassian.net/'
         JIRA_USER = 'giotshibangu@gmail.com'  // Replace with your Jenkins credentials ID for JIRA email
+        BRANCH_NAME = 'SCRUM-4'
     }
     stages {
         stage('Checkout') {
