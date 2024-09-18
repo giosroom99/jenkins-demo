@@ -1,40 +1,28 @@
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const app = require("../src/index"); // Import the app instance
+const request = require('supertest');
+const app = require('../src/index'); // Import the app instance
 
-chai.use(chaiHttp);
-const expect = chai.expect;
-
-describe("GET /", () => {
+describe('GET /', () => {
   let server;
 
   before((done) => {
-    server = app.listen(3001, done); // Start the server on a different port for testing
+    server = app.listen(3001, (err) => {
+      if (err) return done(err);
+      done();
+    }); // Start the server on a different port for testing
   });
 
   after((done) => {
-    server.close(done); // Close the server after tests
+    if (server) {
+      server.close(done); // Close the server after tests
+    } else {
+      done();
+    }
   });
 
-  // it("should return Hello World", (done) => {
-  //   chai
-  //     .request(server)
-  //     .get("/")
-  //     .end((err, res) => {
-  //       expect(res).to.have.status(200);
-  //       expect(res.text).to.equal("Hello World!");
-  //       done();
-  //     });
-  // });
-
-  it("should fail by returning Goodbye World", (done) => {
-    chai
-      .request(server)
-      .get("/")
-      .end((err, res) => {
-        // expect(res).to.have.status(200);
-        expect(res.text).to.equal("Goodbye World!"); // This will fail
-        done();
-      });
+  it('should return Hello World', (done) => {
+    request(server)
+      .get('/')
+      .expect(200)
+      .expect('Hello World!', done);
   });
 });

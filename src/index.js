@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const port = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Goodbye World!");
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
 if (require.main === module) {
@@ -13,5 +13,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-
-//
