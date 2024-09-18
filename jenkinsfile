@@ -9,19 +9,17 @@ pipeline {
             steps {
                 script {
                     // Checkout the code from GitHub
-                    withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
-                        git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
-                        
-                        // Extract the branch name and set it as an environment variable
-                        def branchName = env.BRANCH_NAME
-                        if (branchName) {
-                            def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
-                            // Set the JIRA issue key dynamically
-                            env.JIRA_ISSUE = issueKey
-                        } else {
-                            echo 'BRANCH_NAME is not set. Skipping JIRA issue key extraction.'
-                            env.JIRA_ISSUE = 'UNKNOWN-ISSUE'
-                        }
+                    git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
+                    
+                    // Extract the branch name and set it as an environment variable
+                    def branchName = env.BRANCH_NAME
+                    if (branchName) {
+                        def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
+                        // Set the JIRA issue key dynamically
+                        env.JIRA_ISSUE = issueKey
+                    } else {
+                        echo 'BRANCH_NAME is not set. Skipping JIRA issue key extraction.'
+                        env.JIRA_ISSUE = 'UNKNOWN-ISSUE'
                     }
                 }
             }
@@ -42,20 +40,23 @@ pipeline {
                     // Capture test results or logs
                     def testLog = sh(script: 'npm test', returnStdout: true).trim()
                     
-                    // Encode JIRA_USER and JIRA_API_TOKEN in base64
-                    def authString = "${JIRA_USER}:${JIRA_API_TOKEN}".bytes.encodeBase64().toString()
-                    
-                    // Construct the curl command to post a comment to JIRA
-                    def curlCommand = """
-                        curl -X POST \
-                        -H "Content-Type: application/json" \
-                        -H "Authorization: Basic ${authString}" \
-                        -d '{"body": "${testLog}"}' \
-                        ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
-                    """
-                    
-                    // Execute the curl command
-                    sh curlCommand
+                    // Use credentials for JIRA API token
+                    withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
+                        // Encode JIRA_USER and JIRA_API_TOKEN in base64
+                        def authString = "${JIRA_USER}:${JIRA_API_TOKEN}".bytes.encodeBase64().toString()
+                        
+                        // Construct the curl command to post a comment to JIRA
+                        def curlCommand = """
+                            curl -X POST \
+                            -H "Content-Type: application/json" \
+                            -H "Authorization: Basic ${authString}" \
+                            -d '{"body": "${testLog}"}' \
+                            ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
+                        """
+                        
+                        // Execute the curl command
+                        sh curlCommand
+                    }
                 }
             }
         }
