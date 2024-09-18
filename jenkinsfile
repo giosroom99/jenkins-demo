@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     // Capture test results or logs
-                    def testLog = currentBuild.getRawBuild().getLog()
+                    // def testLog = currentBuild.getRawBuild().getLog()
                     
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
@@ -47,7 +47,7 @@ pipeline {
                             curl -X POST \
                             -H "Content-Type: application/json" \
                             -u ${JIRA_USER}:${JIRA_API_TOKEN} \
-                            -d '{"body": "${testLog}"}' \
+                            -d '{"body": "test test test test"}' \
                             ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
                         """
                         
