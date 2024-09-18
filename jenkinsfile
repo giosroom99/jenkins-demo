@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    environment {
+        JIRA_URL = 'https://injam2024.atlassian.net/'
+        JIRA_USER = credentials('jira-email')  // Replace with your Jenkins credentials ID for JIRA email
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Checkout the code from GitHub
+                    git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
+                    
+                    // Extract the branch name and set it as an environment variable
+                    def branchName = env.BRANCH_NAME
+                    if (branchName) {
+                        def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
+                        // Set the JIRA issue key dynamically
+                        env.JIRA_ISSUE = issueKey
+                    } else {
+                        echo 'BRANCH_NAME is not set. Skipping JIRA issue key extraction.'
+                        env.JIRA_ISSUE = 'UNKNOWN-ISSUE'
+                    }
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Capture test results or logs
+                    def testLog = sh(script: 'npm test', returnStdout: true).trim()
+                    echo "Test Results:\n${testLog}"
+                }
+            }
+        }
+        stage('Post Results to JIRA') {
+            steps {
+                script {
+                    // Use credentials for JIRA API token
+                    withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
+                        // Construct the curl command to post a comment to JIRA
+                        def curlCommand = """
+                            curl -X POST \
+                            -H "Content-Type: application/json" \
+                            -u ${JIRA_USER}:${JIRA_API_TOKEN} \
+                            -d '{"body": "${testLog}"}' \
+                            ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
+                        """
+                        
+                        // Execute the curl command
+                        sh curlCommand
+                    }
+                }
+            }
+        }
+    }
+}
