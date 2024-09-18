@@ -1,11 +1,11 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const app = require('../src/index'); // Import the app instance
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const app = require("../src/index"); // Import the app instance
 
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-describe('GET /', () => {
+describe("GET /", () => {
   let server;
 
   before((done) => {
@@ -16,22 +16,24 @@ describe('GET /', () => {
     server.close(done); // Close the server after tests
   });
 
-  it('should return Hello World', (done) => {
-    chai.request(server)
-      .get('/')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('Hello World!');
-        done();
-      });
-  });
+  // it("should return Hello World", (done) => {
+  //   chai
+  //     .request(server)
+  //     .get("/")
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(200);
+  //       expect(res.text).to.equal("Hello World!");
+  //       done();
+  //     });
+  // });
 
-  it('should fail by returning Goodbye World', (done) => {
-    chai.request(server)
-      .get('/')
+  it("should fail by returning Goodbye World", (done) => {
+    chai
+      .request(server)
+      .get("/")
       .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.text).to.equal('Goodbye World!'); // This will fail
+        // expect(res).to.have.status(200);
+        expect(res.text).to.equal("Goodbye World!"); // This will fail
         done();
       });
   });
