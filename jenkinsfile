@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'my-node-app'
-            args '-v /tmp:/tmp'  // Optional: mount volumes or pass additional arguments if needed
-        }
-    }
+    agent any
     stages {
         stage('Checkout') {
             steps {
