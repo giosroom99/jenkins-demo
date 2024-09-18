@@ -22,7 +22,6 @@ pipeline {
     }
     post {
         always {
-            // Archive test results (if applicable)
             junit '**/target/test-*.xml'
         }
     }
