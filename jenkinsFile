@@ -4,7 +4,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from GitHub
-                git url: 'https://github.com/giosroom99/jenkins-demo.git'
+                git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
             }
         }
         stage('Install Dependencies') {
