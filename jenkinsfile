@@ -1,10 +1,8 @@
-import java.util.Base64
-
 pipeline {
     agent any
     environment {
         JIRA_URL = 'https://injam2024.atlassian.net/'
-        JIRA_USER = credentials('jira-email')  // Replace with your Jenkins credentials ID for JIRA email
+        JIRA_USER = 'giotshibangu@gmail.com'  // Replace with your Jenkins credentials ID for JIRA email
     }
     stages {
         stage('Checkout') {
@@ -44,15 +42,11 @@ pipeline {
                     
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
-                        // Encode JIRA_USER and JIRA_API_TOKEN in base64
-                        def authString = "${JIRA_USER}:${JIRA_API_TOKEN}"
-                        def encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes('UTF-8'))
-                        
                         // Construct the curl command to post a comment to JIRA
                         def curlCommand = """
                             curl -X POST \
                             -H "Content-Type: application/json" \
-                            -H "Authorization: Basic ${encodedAuthString}" \
+                            -u ${JIRA_USER}:${JIRA_API_TOKEN} \
                             -d '{"body": "${testLog}"}' \
                             ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
                         """
