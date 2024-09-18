@@ -3,13 +3,15 @@ pipeline {
     environment {
         JIRA_URL = 'https://injam2024.atlassian.net/'
         JIRA_USER = credentials('jira-email')  // Replace with your Jenkins credentials ID for JIRA email
-        JIRA_API_TOKEN = credentials('jira-api-token')  // Replace with your Jenkins credentials ID for JIRA API token
+        JIRA_API_TOKEN = ''
     }
     stages {
         stage('Checkout') {
             steps {
                 script {
                     // Checkout the code from GitHub
+                    withCredentials([string(credentialsId: 'jira-api-token', variable:'JIRA_API_TOKEN')]) {  
+
                     git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
                     
                     // Extract the branch name and set it as an environment variable
