@@ -14,10 +14,14 @@ pipeline {
                         
                         // Extract the branch name and set it as an environment variable
                         def branchName = env.BRANCH_NAME
-                        def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
-                        
-                        // Set the JIRA issue key dynamically
-                        env.JIRA_ISSUE = issueKey
+                        if (branchName) {
+                            def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
+                            // Set the JIRA issue key dynamically
+                            env.JIRA_ISSUE = issueKey
+                        } else {
+                            echo 'BRANCH_NAME is not set. Skipping JIRA issue key extraction.'
+                            env.JIRA_ISSUE = 'UNKNOWN-ISSUE'
+                        }
                     }
                 }
             }
