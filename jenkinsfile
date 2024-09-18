@@ -31,14 +31,13 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                    def testLog = sh(script: 'npm test', returnStdout: true).trim()
+                    echo "Test Results:\n${testLog}"
             }
         }
         stage('Post Results to JIRA') {
             steps {
                 script {
-                    // Capture test results or logs
-                    def testLog = sh(script: 'npm test', returnStdout: true).trim()
                     
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
