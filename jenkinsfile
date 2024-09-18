@@ -31,8 +31,11 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
+                script {
+                    // Capture test results or logs
                     def testLog = sh(script: 'npm test', returnStdout: true).trim()
                     echo "Test Results:\n${testLog}"
+                }
             }
         }
         stage('Post Results to JIRA') {
