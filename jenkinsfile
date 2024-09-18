@@ -3,7 +3,7 @@ pipeline {
     environment {
         JIRA_URL = 'https://injam2024.atlassian.net/'
         JIRA_USER = 'giotshibangu@gmail.com'  // Replace with your Jenkins credentials ID for JIRA email
-        BRANCH_NAME = 'SCRUM-4'
+        BRANCH_NAME = 'SCRUM-4'  // Simulating the branch name; adjust as needed
     }
     stages {
         stage('Checkout') {
@@ -32,14 +32,18 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                script {
+                    // Capture test results or logs
+                    def testLog = sh(script: 'npm test', returnStdout: true).trim()
+                    env.TEST_LOG = testLog
+                }
             }
         }
         stage('Post Results to JIRA') {
             steps {
                 script {
-                    // Capture test results or logs
-                    def testLog = currentBuild.getRawBuild().getLog()
+                    // Escape quotes and newlines in the test log to ensure valid JSON
+                    def escapedTestLog = env.TEST_LOG.replaceAll('(["\\\\])', '\\\\$1').replaceAll('\n', '\\n')
                     
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
@@ -48,7 +52,7 @@ pipeline {
                             curl -X POST \
                             -H "Content-Type: application/json" \
                             -u ${JIRA_USER}:${JIRA_API_TOKEN} \
-                            -d '{"body": ${testLog}}' \
+                            -d '{"body": "${escapedTestLog}"}' \
                             ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
                         """
                         
