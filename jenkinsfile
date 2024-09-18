@@ -34,8 +34,13 @@ pipeline {
             steps {
                 script {
                     // Capture test results or logs
-                    def testLog = sh(script: 'npm test', returnStdout: true, returnStatus: true).trim()
-                    env.TEST_LOG = testLog
+                    try {
+                        def testLog = sh(script: 'npm test', returnStdout: true).trim()
+                        env.TEST_LOG = testLog
+                    } catch (Exception e) {
+                        echo "Tests failed: ${e.message}"
+                        env.TEST_LOG = "Tests failed: ${e.message}"
+                    }
                 }
             }
         }
@@ -66,15 +71,14 @@ pipeline {
     post {
         always {
             script {
-                // Capture test results or logs
-                def testLog = env.TEST_LOG ?: 'No test logs available'
+                // Ensure results are posted to JIRA even if previous stages failed
+                if (!env.TEST_LOG) {
+                    env.TEST_LOG = "No test logs available"
+                }
                 
-                // Escape quotes and newlines in the test log to ensure valid JSON
-                def escapedTestLog = testLog.replaceAll('(["\\\\])', '\\\\$1').replaceAll('\n', '\\n')
-                
-                // Use credentials for JIRA API token
                 withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
-                    // Construct the curl command to post a comment to JIRA
+                    def escapedTestLog = env.TEST_LOG.replaceAll('(["\\\\])', '\\\\$1').replaceAll('\n', '\\n')
+                    
                     def curlCommand = """
                         curl -X POST \
                         -H "Content-Type: application/json" \
@@ -83,7 +87,6 @@ pipeline {
                         ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
                     """
                     
-                    // Execute the curl command
                     sh curlCommand
                 }
             }
