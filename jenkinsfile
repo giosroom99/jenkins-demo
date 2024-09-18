@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     // Capture test results or logs
-                    def testLog = sh(script: 'curl ${BUILD_URL}/consoleText').trim()
+                    def testLog = currentBuild.getRawBuild().getLog()
                     
                     // Use credentials for JIRA API token
                     withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
