@@ -3,7 +3,6 @@ pipeline {
     environment {
         JIRA_URL = 'https://injam2024.atlassian.net/'
         JIRA_USER = 'giotshibangu@gmail.com'  // Replace with your Jenkins credentials ID for JIRA email
-        BRANCH_NAME = 'SCRUM-5'  // Simulating the branch name; adjust as needed
     }
     stages {
         stage('Checkout') {
@@ -13,15 +12,7 @@ pipeline {
                     git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
                     
                     // Extract the branch name and set it as an environment variable
-                    def branchName = env.BRANCH_NAME
-                    if (branchName) {
-                        def issueKey = branchName.split('/').last()  // Assuming branch name format like 'feature/YOUR-ISSUE-KEY'
-                        // Set the JIRA issue key dynamically
-                        env.JIRA_ISSUE = issueKey
-                    } else {
-                        echo 'BRANCH_NAME is not set. Skipping JIRA issue key extraction.'
-                        env.JIRA_ISSUE = 'UNKNOWN-ISSUE'
-                    }
+                    env.JIRA_ISSUE = env.GIT_BRANCH.substring(env.GIT_BRANCH.lastIndexOf("/") + 1)
                 }
             }
         }
@@ -93,3 +84,4 @@ pipeline {
         }
     }
 }
+
