@@ -25,12 +25,4 @@ describe('GET /', () => {
       .expect(200)
       .expect('Hello World!', done);
   });
-
-  it('should return Hello orld', (done) => {
-    request(server)
-      .get('/')
-      .expect(202)
-      .expect('Hello World!', done);
-  });
-  
 });
