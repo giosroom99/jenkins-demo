@@ -35,30 +35,6 @@ pipeline {
                 }
             }
         }
-        stage('Post Results to JIRA') {
-            steps {
-                script {
-                    // Escape quotes and newlines in the test log to ensure valid JSON
-                    def escapedTestLog = env.TEST_LOG.replaceAll('(["\\\\])', '\\\\$1').replaceAll('\n', '\\n')
-                    
-                    // Use credentials for JIRA API token
-                    withCredentials([string(credentialsId: 'jira-api-token', variable: 'JIRA_API_TOKEN')]) {
-                        // Construct the curl command to post a comment to JIRA
-                        def curlCommand = """
-                            curl -X POST \
-                            -H "Content-Type: application/json" \
-                            -u ${JIRA_USER}:${JIRA_API_TOKEN} \
-                            -d '{"body": "${escapedTestLog}"}' \
-                            ${JIRA_URL}/rest/api/2/issue/${env.JIRA_ISSUE}/comment
-                        """
-                        
-                        // Execute the curl command
-                        sh curlCommand
-                    }
-                }
-            }
-        }
-    }
     post {
         always {
             script {
