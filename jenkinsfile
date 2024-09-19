@@ -8,7 +8,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Checkout the code from GitHub
+                    // Checkout the code from GitHub -
                     git branch: 'main', url: 'https://github.com/giosroom99/jenkins-demo.git'
                     
                     // Extract the branch name and set it as an environment variable
