@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/index'); // Import the app instance
+const app = require('../src/index'); 
 
 describe('GET /', () => {
   let server;
@@ -8,12 +8,12 @@ describe('GET /', () => {
     server = app.listen(3001, (err) => {
       if (err) return done(err);
       done();
-    }); // Start the server on a different port for testing
+    }); 
   });
 
   after((done) => {
     if (server) {
-      server.close(done); // Close the server after tests
+      server.close(done); 
     } else {
       done();
     }
